@@ -118,7 +118,7 @@ async function fetchWeather() {
         const curr = data.current;
         currentTempEl.textContent = `${Math.round(curr.temp)}°F`;
         currentPrecipEl.textContent = `${Math.round((curr.pop || 0) * 100)}% of rain`;
-        currentIconEl.src = `https://openweathermap.org/img/wn/${curr.weather[0].icon}@4x.png`;
+        currentIconEl.src = `https://openweathermap.org/img/wn/${curr.weather[0].icon}@2x.png`;
         currentDescEl.textContent = curr.weather[0].description;
 
         // Forecast
@@ -137,7 +137,7 @@ async function fetchWeather() {
             div.className = "forecast-item";
             div.innerHTML = `
                 <div>${hour} ${ampm}</div>
-                <img class="forecast-icon" src="https://openweathermap.org/img/wn/${icon}@4x.png">
+                <img class="forecast-icon" src="https://openweathermap.org/img/wn/${icon}@2x.png">
                 <div>${Math.round(h.temp)}°F</div>
                 <div>${Math.round(h.pop * 100)}% rain</div>
             `;
