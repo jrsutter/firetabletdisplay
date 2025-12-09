@@ -1,181 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Clock + Weather Display</title>
-
-<!-- Modern Font -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
-<style>
-    body {
-        margin: 0;
-        background: black;
-        font-family: "Inter", sans-serif;
-        color: white;
-        overflow: hidden;
-        user-select: none;
-    }
-
-    #clock {
-        height: 66vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 14vw;
-        font-weight: 600;
-    }
-
-    #weather {
-        height: 34vh;
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        border-top: 2px solid #444;
-    }
-
-    .box {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 10px;
-        text-align: center;
-        border-right: 1px solid #333;
-    }
-
-    .box:last-child {
-        border-right: none;
-    }
-
-    /* Settings Menu */
-    #settingsMenu {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(20, 20, 20, 0.95);
-        padding: 20px;
-        color: white;
-        display: none;
-        border-top: 2px solid #555;
-    }
-
-    #settingsMenu label {
-        display: block;
-        margin-top: 10px;
-        font-size: 1.2rem;
-    }
-</style>
+    <meta charset="UTF-8">
+    <title>Clock + Weather Dashboard</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div id="clock">--:--</div>
+<div id="dashboard">
 
-<div id="weather">
-    <div class="box" id="box0">Loading...</div>
-    <div class="box" id="box1"></div>
-    <div class="box" id="box2"></div>
-    <div class="box" id="box3"></div>
+    <!-- CLOCK SECTION -->
+    <div id="clock-section">
+        <div id="time">--:--</div>
+        <div id="date"></div>
+    </div>
+
+    <!-- WEATHER SECTION -->
+    <div id="weather-section">
+
+        <!-- CURRENT WEATHER -->
+        <div id="current-weather" class="weather-box">
+            <img id="current-icon" class="weather-icon-large" src="" alt="">
+            <div id="current-temp"></div>
+            <div id="current-desc"></div>
+            <div id="current-precip"></div>
+        </div>
+
+        <!-- FORECAST BOXES -->
+        <div id="forecast" class="forecast-grid">
+            <!-- Filled by JS -->
+        </div>
+
+    </div>
 </div>
 
-<!-- Settings Panel -->
-<div id="settingsMenu">
-    <label>Brightness</label>
-    <input type="range" id="brightnessSlider" min="0" max="100" value="100" />
+<!-- SETTINGS MENU -->
+<div id="settings">
+    <h2>Settings</h2>
+
+    <label>Clock Size (px):</label>
+    <input type="range" id="clock-size" min="50" max="300">
+
+    <label>Brightness:</label>
+    <input type="range" id="brightness" min="10" max="255">
+
+    <label>Dim Start:</label>
+    <input type="time" id="dim-start">
+
+    <label>Dim End:</label>
+    <input type="time" id="dim-end">
+
+    <button id="btn-save">Save</button>
 </div>
 
-<script>
-//////////////// CLOCK ///////////////////
-function updateClock() {
-    const now = new Date();
-    const h = now.getHours().toString().padStart(2, "0");
-    const m = now.getMinutes().toString().padStart(2, "0");
-    document.getElementById("clock").textContent = `${h}:${m}`;
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-//////////////// WEATHER //////////////////
-// ---- CHANGE THESE TO YOUR COORDINATES ----
-const LAT = 32.7767;
-const LON = -96.7970;
-
-async function loadWeather() {
-    const url = 
-`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=temperature_2m,precipitation_probability,weathercode&daily=temperature_2m_max,temperature_2m_min,weathercode&current_weather=true&timezone=auto`;
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    const current = data.current_weather;
-    const tempMax = data.daily.temperature_2m_max[0];
-    const tempMin = data.daily.temperature_2m_min[0];
-    const precipNow = data.hourly.precipitation_probability[0];
-
-    // Box 0 (current conditions)
-    document.getElementById("box0").innerHTML =
-        `<div style="font-size:4vw; font-weight:600;">${current.temperature}°</div>
-         <div>${weatherDescription(current.weathercode)}</div>
-         <div>H: ${tempMax}° • L: ${tempMin}°</div>
-         <div>${precipNow}% chance</div>`;
-
-    // Next 4 hours (boxes 1–3)
-    const nowHour = new Date().getHours();
-    for (let i = 1; i <= 3; i++) {
-        const hourIndex = nowHour + i;
-        const t = data.hourly.temperature_2m[hourIndex];
-        const p = data.hourly.precipitation_probability[hourIndex];
-        const code = data.hourly.weathercode[hourIndex];
-
-        document.getElementById("box" + i).innerHTML =
-            `<div style="font-size:3vw;">+${i} hr</div>
-             <div style="font-size:4vw; font-weight:600;">${t}°</div>
-             <div>${weatherDescription(code)}</div>
-             <div>${p}%</div>`;
-    }
-}
-
-function weatherDescription(code) {
-    const map = {
-        0: "Clear",
-        1: "Mainly clear",
-        2: "Partly cloudy",
-        3: "Cloudy",
-        45: "Fog",
-        51: "Light drizzle",
-        61: "Rain",
-        71: "Snow",
-        80: "Showers",
-    };
-    return map[code] || "Weather";
-}
-
-loadWeather();
-setInterval(loadWeather, 30 * 60 * 1000);  // 30 minutes
-
-//////////////// SETTINGS MENU //////////////////
-let menuVisible = false;
-document.body.addEventListener("click", () => {
-    menuVisible = !menuVisible;
-    document.getElementById("settingsMenu").style.display = menuVisible ? "block" : "none";
-});
-
-// Brightness slider (fade white toward gray/black)
-document.getElementById("brightnessSlider").addEventListener("input", e => {
-    const v = e.target.value;
-    const c = Math.floor((v / 100) * 255);
-    document.body.style.color = `rgb(${c},${c},${c})`;
-});
-
-//////////////// AUTO FULLSCREEN //////////////////
-document.addEventListener("click", () => {
-    if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-    }
-}, { once: true });
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
