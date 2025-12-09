@@ -164,7 +164,7 @@ function showSettings() {
 
 document.getElementById("dashboard").addEventListener("click", showSettings);
 
-clockSizeInput.max = 300; // increased max
+clockSizeInput.max = 500; // increased max
 
 clockSizeInput.addEventListener("input", applySettings);
 brightnessInput.addEventListener("input", applySettings);
