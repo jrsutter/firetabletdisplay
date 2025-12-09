@@ -27,7 +27,7 @@ let settingsTimeout;
 function loadSettings() {
     console.log("Loading settings");
     const s = JSON.parse(localStorage.getItem("dashboard-settings") || "{}");
-    clockSizeInput.value = s.clockSize || 300;
+    clockSizeInput.value = s.clockSize || 450;
     brightnessInput.value = s.brightness || 100;
     dimStartInput.value = s.dimStart || "21:00";
     dimEndInput.value = s.dimEnd || "06:00";
@@ -114,16 +114,24 @@ async function fetchWeather() {
         const data = await res.json();
         console.log("Weather data received:", data);
 
-        // Current
+        // Current weather
         const curr = data.current;
         currentTempEl.textContent = `${Math.round(curr.temp)}°F`;
-        currentPrecipEl.textContent = `${Math.round((curr.pop || 0) * 100)}% of rain`;
-        currentIconEl.src = `https://openweathermap.org/img/wn/${curr.weather[0].icon}@2x.png`;
-        currentIconEl.alt = curr.weather[0].description;
-        currentDescEl.textContent = curr.weather[0].description;
-        console.log("Current icon URL:", currentIconEl.src);
 
-        // Forecast
+        // Use hourly[0].pop for current precipitation chance
+        const currentPop = data.hourly[0]?.pop ?? 0;
+        currentPrecipEl.textContent = `${Math.round(currentPop * 100)}% of rain`;
+
+        const currentWeather = curr.weather[0];
+        currentIconEl.src = `https://openweathermap.org/img/wn/${currentWeather.icon}@2x.png`;
+        currentIconEl.alt = currentWeather.description;
+        currentDescEl.textContent = currentWeather.description;
+
+        console.log("Current Temp:", curr.temp);
+        console.log("Current Rain Chance:", currentPop);
+        console.log("Current Icon URL:", currentIconEl.src);
+
+        // Forecast for next 12 hours (3 chunks of 4 hours)
         forecastEl.innerHTML = "";
         for (let i = 4; i <= 12; i += 4) {
             const h = data.hourly[i];
@@ -164,8 +172,7 @@ function showSettings() {
 
 document.getElementById("dashboard").addEventListener("click", showSettings);
 
-clockSizeInput.max = 500; // increased max
-
+clockSizeInput.max = 700; // can adjust if you want bigger
 clockSizeInput.addEventListener("input", applySettings);
 brightnessInput.addEventListener("input", applySettings);
 dimStartInput.addEventListener("input", applySettings);
