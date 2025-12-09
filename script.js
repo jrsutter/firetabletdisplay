@@ -1,3 +1,7 @@
+//TEST LOG
+console.log("Script loaded");
+
+
 // === CONFIG ===
 const API_KEY = "a0df3a129b9aae7b8aab104f4eca575a";
 const LAT = "30.312156";
