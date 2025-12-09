@@ -1,11 +1,12 @@
 html, body {
-  margin:0;
-  padding:0;
-  height:100%;
-  background:black;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: black !important;
+  color: white !important;
   font-family: 'Orbitron', monospace;
-  overflow:hidden;
 }
+
 
 #dashboard {
   width:100%;
