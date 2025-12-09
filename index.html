@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Clock Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="dashboard">
+  <div id="clock-container">
+    <div id="time">--:--:--</div>
+    <div id="date">Loading...</div>
+  </div>
+
+  <div id="weather-container">
+    <div id="current-weather">
+      <img id="current-icon" src="" alt="">
+      <span id="current-temp">--°F</span>
+      <span id="current-precip">--%</span>
+    </div>
+    <div id="forecast"></div>
+  </div>
+
+  <div id="settings" class="hidden">
+    <h3>Settings</h3>
+    <label>Clock Size
+      <input type="range" id="clock-size" min="50" max="200" value="100">
+    </label>
+    <label>Brightness
+      <input type="range" id="brightness" min="0" max="100" value="100">
+    </label>
+    <button id="btn-save">Save</button>
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
