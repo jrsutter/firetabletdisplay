@@ -1,6 +1,6 @@
 // === CONFIG ===
 console.log("Script loaded");
-const API_KEY = "a0df3a129b9aae7b8aab104f4eca575a"; // replace with your API key
+const API_KEY = "ccd59c5e8afff546aeb07513036a9b55"; // replace with your API key
 const LAT = "30.312156";
 const LON = "-95.456014";
 const REFRESH_INTERVAL_MIN = 30;
