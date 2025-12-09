@@ -4,33 +4,31 @@
     <meta charset="UTF-8">
     <title>Clock + Weather Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Font example -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <div id="dashboard">
 
-    <!-- CLOCK SECTION (top 2/3 of screen) -->
+    <!-- CLOCK SECTION -->
     <div id="clock-section">
         <div id="time">--:--</div>
         <div id="date">Loading...</div>
     </div>
 
-    <!-- WEATHER SECTION (bottom 1/3) -->
+    <!-- WEATHER SECTION -->
     <div id="weather-section">
 
         <!-- CURRENT WEATHER -->
         <div id="current-weather" class="weather-box">
             <img id="current-icon" class="weather-icon-large" src="" alt="Current Weather">
-            <div id="current-temp"></div>
-            <div id="current-desc"></div>
-            <div id="current-precip"></div>
+            <div id="current-temp">--°F</div>
+            <div id="current-desc">Loading...</div>
+            <div id="current-precip">--% of rain</div>
         </div>
 
         <!-- FORECAST GRID -->
         <div id="forecast" class="forecast-grid">
-            <!-- Forecast boxes added by script.js -->
+            <!-- Forecast items added by script.js -->
         </div>
 
     </div>
@@ -42,7 +40,7 @@
     <h2>Settings</h2>
 
     <label>Clock Size (px):</label>
-    <input type="range" id="clock-size" min="50" max="500">
+    <input type="range" id="clock-size" min="50" max="300">
 
     <label>Brightness:</label>
     <input type="range" id="brightness" min="10" max="255">
@@ -56,8 +54,6 @@
     <button id="btn-save">Save</button>
 </div>
 
-<!-- Your script -->
 <script src="script.js"></script>
-
 </body>
 </html>
