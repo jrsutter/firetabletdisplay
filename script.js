@@ -1,9 +1,6 @@
-//TEST LOG
-console.log("Script loaded");
-
-
 // === CONFIG ===
-const API_KEY = "a0df3a129b9aae7b8aab104f4eca575a";
+console.log("Script loaded");
+const API_KEY = "a0df3a129b9aae7b8aab104f4eca575a"; // replace with your API key
 const LAT = "30.312156";
 const LON = "-95.456014";
 const REFRESH_INTERVAL_MIN = 30;
@@ -28,18 +25,18 @@ let settingsTimeout;
 
 // === LOAD SETTINGS ===
 function loadSettings() {
+    console.log("Loading settings");
     const s = JSON.parse(localStorage.getItem("dashboard-settings") || "{}");
-
     clockSizeInput.value = s.clockSize || 150;
     brightnessInput.value = s.brightness || 100;
     dimStartInput.value = s.dimStart || "21:00";
     dimEndInput.value = s.dimEnd || "06:00";
-
     applySettings();
 }
 
 // === SAVE SETTINGS ===
 function saveSettings() {
+    console.log("Saving settings");
     localStorage.setItem(
         "dashboard-settings",
         JSON.stringify({
@@ -53,9 +50,8 @@ function saveSettings() {
 
 // === APPLY SETTINGS ===
 function applySettings() {
-    // Apply clock size
+    console.log("Applying settings");
     timeEl.style.fontSize = `${clockSizeInput.value}px`;
-
     applyBrightness();
 }
 
@@ -63,18 +59,14 @@ function applySettings() {
 function applyBrightness() {
     const now = new Date();
     const current = now.getHours() * 60 + now.getMinutes();
-
     const dimStart = parseTime(dimStartInput.value);
     const dimEnd = parseTime(dimEndInput.value);
-
     let brightness;
 
     if (dimStart < dimEnd) {
-        // Example: dim from 21:00 to 06:00 (wraps midnight)
         if (current >= dimStart && current < dimEnd) brightness = 40;
         else brightness = brightnessInput.value;
     } else {
-        // Example: dim from 22:00 to 23:00 (no wrap)
         if (current >= dimStart || current < dimEnd) brightness = 40;
         else brightness = brightnessInput.value;
     }
@@ -105,29 +97,34 @@ function updateClock() {
     const m = now.getMinutes().toString().padStart(2, "0");
     const ampm = h >= 12 ? "PM" : "AM";
     h = h % 12 || 12;
-
     timeEl.textContent = `${h}:${m} ${ampm}`;
+    dateEl.textContent = now.toDateString();
 }
 setInterval(updateClock, 1000);
 updateClock();
 
 // === WEATHER ===
 async function fetchWeather() {
+    console.log("Fetching weather...");
     try {
         const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${LAT}&lon=${LON}&exclude=minutely,daily,alerts&units=imperial&appid=${API_KEY}`;
+        console.log("Weather API URL:", url);
         const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
+        console.log("Weather data received:", data);
 
         // Current
         const curr = data.current;
         currentTempEl.textContent = `${Math.round(curr.temp)}°F`;
         currentPrecipEl.textContent = `${Math.round((curr.pop || 0) * 100)}% of rain`;
         currentIconEl.src = `https://openweathermap.org/img/wn/${curr.weather[0].icon}@2x.png`;
+        currentIconEl.alt = curr.weather[0].description;
         currentDescEl.textContent = curr.weather[0].description;
+        console.log("Current icon URL:", currentIconEl.src);
 
         // Forecast
         forecastEl.innerHTML = "";
-
         for (let i = 4; i <= 12; i += 4) {
             const h = data.hourly[i];
             const icon = h.weather[0].icon;
@@ -141,16 +138,17 @@ async function fetchWeather() {
             div.className = "forecast-item";
             div.innerHTML = `
                 <div>${hour} ${ampm}</div>
-                <img class="forecast-icon" src="https://openweathermap.org/img/wn/${icon}@2x.png">
+                <img class="forecast-icon" src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="${h.weather[0].description}">
                 <div>${Math.round(h.temp)}°F</div>
-                <div>${Math.round(h.pop * 100)}% rain</div>
+                <div>${Math.round(h.pop*100)}% rain</div>
             `;
             forecastEl.appendChild(div);
+            console.log(`Forecast icon URL: https://openweathermap.org/img/wn/${icon}@2x.png`);
         }
 
         applyBrightness();
     } catch (e) {
-        console.error(e);
+        console.error("Weather fetch failed:", e);
     }
 }
 
@@ -166,7 +164,7 @@ function showSettings() {
 
 document.getElementById("dashboard").addEventListener("click", showSettings);
 
-clockSizeInput.max = 500; // increase maximum size
+clockSizeInput.max = 300; // increased max
 
 clockSizeInput.addEventListener("input", applySettings);
 brightnessInput.addEventListener("input", applySettings);
