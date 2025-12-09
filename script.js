@@ -27,7 +27,7 @@ let settingsTimeout;
 function loadSettings() {
     console.log("Loading settings");
     const s = JSON.parse(localStorage.getItem("dashboard-settings") || "{}");
-    clockSizeInput.value = s.clockSize || 450;
+    clockSizeInput.value = s.clockSize || 150;
     brightnessInput.value = s.brightness || 100;
     dimStartInput.value = s.dimStart || "21:00";
     dimEndInput.value = s.dimEnd || "06:00";
@@ -64,11 +64,9 @@ function applyBrightness() {
     let brightness;
 
     if (dimStart < dimEnd) {
-        if (current >= dimStart && current < dimEnd) brightness = 40;
-        else brightness = brightnessInput.value;
+        brightness = (current >= dimStart && current < dimEnd) ? 40 : brightnessInput.value;
     } else {
-        if (current >= dimStart || current < dimEnd) brightness = 40;
-        else brightness = brightnessInput.value;
+        brightness = (current >= dimStart || current < dimEnd) ? 40 : brightnessInput.value;
     }
 
     const val = `rgb(${brightness},${brightness},${brightness})`;
@@ -77,10 +75,7 @@ function applyBrightness() {
     currentTempEl.style.color = val;
     currentPrecipEl.style.color = val;
     currentDescEl.style.color = val;
-
-    document.querySelectorAll(".forecast-item").forEach((el) => {
-        el.style.color = val;
-    });
+    document.querySelectorAll(".forecast-item").forEach(el => el.style.color = val);
 }
 
 function parseTime(t) {
@@ -117,10 +112,8 @@ async function fetchWeather() {
         // Current weather
         const curr = data.current;
         currentTempEl.textContent = `${Math.round(curr.temp)}°F`;
-
-        // Use hourly[0].pop for current precipitation chance
         const currentPop = data.hourly[0]?.pop ?? 0;
-        currentPrecipEl.textContent = `${Math.round(currentPop * 100)}% of rain`;
+        currentPrecipEl.textContent = `${Math.round(currentPop*100)}% of rain`;
 
         const currentWeather = curr.weather[0];
         currentIconEl.src = `https://openweathermap.org/img/wn/${currentWeather.icon}@2x.png`;
@@ -131,7 +124,7 @@ async function fetchWeather() {
         console.log("Current Rain Chance:", currentPop);
         console.log("Current Icon URL:", currentIconEl.src);
 
-        // Forecast for next 12 hours (3 chunks of 4 hours)
+        // Forecast next 12 hours in 3 chunks of 4 hours
         forecastEl.innerHTML = "";
         for (let i = 4; i <= 12; i += 4) {
             const h = data.hourly[i];
@@ -161,25 +154,23 @@ async function fetchWeather() {
 }
 
 fetchWeather();
-setInterval(fetchWeather, REFRESH_INTERVAL_MIN * 60 * 1000);
+setInterval(fetchWeather, REFRESH_INTERVAL_MIN*60*1000);
 
 // === SETTINGS PANEL ===
 function showSettings() {
     settingsEl.classList.add("visible");
-    if (settingsTimeout) clearTimeout(settingsTimeout);
+    if(settingsTimeout) clearTimeout(settingsTimeout);
     settingsTimeout = setTimeout(() => settingsEl.classList.remove("visible"), 10000);
 }
 
 document.getElementById("dashboard").addEventListener("click", showSettings);
 
-clockSizeInput.max = 700; // can adjust if you want bigger
 clockSizeInput.addEventListener("input", applySettings);
 brightnessInput.addEventListener("input", applySettings);
 dimStartInput.addEventListener("input", applySettings);
 dimEndInput.addEventListener("input", applySettings);
 btnSave.addEventListener("click", saveSettings);
 
-// Load saved settings
 loadSettings();
 
 // Fullscreen
