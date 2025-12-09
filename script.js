@@ -27,7 +27,7 @@ let settingsTimeout;
 function loadSettings() {
     console.log("Loading settings");
     const s = JSON.parse(localStorage.getItem("dashboard-settings") || "{}");
-    clockSizeInput.value = s.clockSize || 150;
+    clockSizeInput.value = s.clockSize || 300;
     brightnessInput.value = s.brightness || 100;
     dimStartInput.value = s.dimStart || "21:00";
     dimEndInput.value = s.dimEnd || "06:00";
