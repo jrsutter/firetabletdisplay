@@ -3,7 +3,7 @@ body {
     margin: 0;
     background: black;
     color: white;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Arial, Helvetica, sans-serif; /* restored font */
     user-select: none;
     overflow: hidden;
 }
@@ -49,8 +49,8 @@ body {
 }
 
 .weather-icon-large {
-    width: 140px;
-    height: 140px;
+    width: 200px;
+    height: 200px;
     margin-bottom: 8px;
 }
 
@@ -90,8 +90,8 @@ body {
 }
 
 .forecast-icon {
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
 }
 
 /* SETTINGS MENU */
@@ -127,7 +127,7 @@ body {
     width: 100%;
     margin-top: 20px;
     padding: 10px;
-    font-size: 20px;
+    font-size: 16px;
     background: #00aaff;
     border: none;
     border-radius: 6px;
