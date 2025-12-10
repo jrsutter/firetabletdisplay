@@ -7,9 +7,6 @@ const REFRESH_INTERVAL_MIN = 30;
 // === DOM Elements ===
 const timeEl = document.getElementById('time');
 const dateEl = document.getElementById('date');
-const currentTempEl = document.getElementById('current-temp');
-const currentPrecipEl = document.getElementById('current-precip');
-const currentIconEl = document.getElementById('current-icon');
 const currentTempBottomEl = document.getElementById('current-temp-bottom');
 const currentPrecipBottomEl = document.getElementById('current-precip-bottom');
 const currentIconBottomEl = document.getElementById('current-icon-bottom');
@@ -17,6 +14,7 @@ const forecastEl = document.getElementById('forecast');
 
 const settingsEl = document.getElementById('settings');
 const clockSizeInput = document.getElementById('clock-size');
+const textSizeInput = document.getElementById('text-size');
 const brightnessInput = document.getElementById('brightness');
 const dimStartInput = document.getElementById('dim-start');
 const dimEndInput = document.getElementById('dim-end');
@@ -45,6 +43,7 @@ function loadSettings() {
     console.log("Loading settings");
     const s = JSON.parse(localStorage.getItem('dashboard-settings') || '{}');
     clockSizeInput.value = s.clockSize || 100;
+    textSizeInput.value = s.textSize || 32;
     brightnessInput.value = s.brightness || 255;
     dimStartInput.value = s.dimStart || "22:00";
     dimEndInput.value = s.dimEnd || "06:30";
@@ -55,6 +54,7 @@ function saveSettings() {
     console.log("Saving settings");
     localStorage.setItem('dashboard-settings', JSON.stringify({
         clockSize: clockSizeInput.value,
+        textSize: textSizeInput.value,
         brightness: brightnessInput.value,
         dimStart: dimStartInput.value,
         dimEnd: dimEndInput.value
@@ -69,22 +69,22 @@ function applySettings() {
     // Clock and date
     timeEl.style.fontSize = `${clockSizeInput.value}px`;
     timeEl.style.color = color;
+    dateEl.style.fontSize = `${textSizeInput.value}px`;
     dateEl.style.color = color;
 
-    // Current weather
-    currentTempEl.style.color = color;
-    currentPrecipEl.style.color = color;
-    currentIconEl.style.color = color;
-
+    // Bottom weather
+    currentTempBottomEl.style.fontSize = `${textSizeInput.value}px`;
+    currentPrecipBottomEl.style.fontSize = `${textSizeInput.value}px`;
     currentTempBottomEl.style.color = color;
     currentPrecipBottomEl.style.color = color;
     currentIconBottomEl.style.color = color;
 
-    // Forecast items (text + icons)
+    // Forecast items
     document.querySelectorAll('.forecast-item').forEach(item => {
         item.style.color = color;
         const icon = item.querySelector('.wi');
         if(icon) icon.style.color = color;
+        item.querySelectorAll('div').forEach(div => div.style.fontSize = `${textSizeInput.value}px`);
     });
 }
 
@@ -110,17 +110,11 @@ function updateClock() {
         const dimmed = brightnessInput.value * 0.4;
         const color = `rgb(${dimmed},${dimmed},${dimmed})`;
 
-        // Apply dim color to all text and icons
         timeEl.style.color=color;
         dateEl.style.color=color;
-        currentTempEl.style.color=color;
-        currentPrecipEl.style.color=color;
-        currentIconEl.style.color=color;
-
         currentTempBottomEl.style.color=color;
         currentPrecipBottomEl.style.color=color;
         currentIconBottomEl.style.color=color;
-
         document.querySelectorAll('.forecast-item').forEach(item => {
             item.style.color = color;
             const icon = item.querySelector('.wi');
@@ -144,7 +138,7 @@ async function fetchWeather(){
         const data = await res.json();
         console.log("Weather data:",data);
 
-        // Current bottom weather
+        // Bottom current weather
         const nowData = data.list[0];
         currentTempBottomEl.textContent = `${Math.round(nowData.main.temp)}°F (H:${Math.round(nowData.main.temp_max)} L:${Math.round(nowData.main.temp_min)})`;
         const precip = nowData.pop ? Math.round(nowData.pop*100) : 0;
@@ -198,6 +192,7 @@ function showSettings(){
 
 document.getElementById('dashboard').addEventListener('click', showSettings);
 clockSizeInput.addEventListener('input', applySettings);
+textSizeInput.addEventListener('input', applySettings);
 brightnessInput.addEventListener('input', applySettings);
 dimStartInput.addEventListener('input', applySettings);
 dimEndInput.addEventListener('input', applySettings);
