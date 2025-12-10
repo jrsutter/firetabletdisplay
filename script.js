@@ -145,7 +145,7 @@ setInterval(fetchWeather, REFRESH_INTERVAL_MIN*60*1000);
 function showSettings() {
     settingsEl.classList.add('visible');
     if(settingsTimeout) clearTimeout(settingsTimeout);
-    settingsTimeout = setTimeout(()=>settingsEl.classList.remove('visible'),5000);
+    settingsTimeout = setTimeout(()=>settingsEl.classList.remove('visible'),10000);
 }
 
 // Tap anywhere to show settings
