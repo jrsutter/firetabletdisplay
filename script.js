@@ -41,7 +41,7 @@ function getWeatherIcon(iconCode) {
 function loadSettings() {
     console.log("Loading settings");
     const s = JSON.parse(localStorage.getItem('dashboard-settings') || '{}');
-    clockSizeInput.value = s.clockSize || 100;
+    clockSizeInput.value = s.clockSize || 150;
     brightnessInput.value = s.brightness || 255;
     dimStartInput.value = s.dimStart || "22:00";
     dimEndInput.value = s.dimEnd || "06:30";
