@@ -1,4 +1,3 @@
-/* Global */
 :root{
   --bg: #000;
   --panel-bg: rgba(30,30,30,0.95);
@@ -15,7 +14,7 @@ html,body{
   overflow:hidden;
 }
 
-/* Layout container */
+/* Layout */
 #dashboard{
   height:100vh;
   display:flex;
@@ -51,7 +50,6 @@ html,body{
   grid-template-columns: 1fr 3fr; /* left current, right forecast 3 columns */
   gap:0;
   align-items:stretch;
-  border-top: 0; /* no border per request */
 }
 
 /* Current box (left) */
