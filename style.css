@@ -1,128 +1,75 @@
-:root{
-  --bg: #000;
-  --panel-bg: rgba(30,30,30,0.95);
-  --accent: #00aaff;
-}
-html,body{
-  height:100%;
-  margin:0;
-  background:var(--bg);
-  color:#fff;
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  overflow:hidden;
+html, body {
+    margin:0; 
+    padding:0; 
+    height:100%; 
+    background:black; 
+    color:white;
+    font-family: 'Helvetica Neue', sans-serif; 
+    overflow:hidden;
 }
 
-/* Layout */
-#dashboard{
-  height:100vh;
-  display:flex;
-  flex-direction:column;
+#dashboard {
+    display:flex; 
+    flex-direction:column; 
+    height:100%; 
+    width:100%;
 }
 
-/* Clock (top 2/3) */
-#clock-section{
-  flex:2;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding: 10px;
-}
-#time{
-  font-size:150px;
-  line-height:0.9;
-  font-weight:700;
-  color: #fff;
-}
-#date{
-  margin-top:6px;
-  font-size:28px;
-  color: rgba(255,255,255,0.85);
+/* Top 2/3 for clock and date */
+#top {
+    flex:2; 
+    display:flex; 
+    flex-direction:column;
+    justify-content:center; 
+    align-items:center;
 }
 
-/* Weather (bottom 1/3) */
-#weather-section{
-  flex:1;
-  display:grid;
-  grid-template-columns: 1fr 3fr; /* left current, right forecast 3 columns */
-  gap:0;
-  align-items:stretch;
+#time { font-size:100px; }
+#date { font-size:32px; margin-bottom:10px; }
+
+/* Bottom 1/3 for weather */
+#bottom {
+    flex:1; 
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between; /* evenly space all boxes */
+    border-top:1px solid black; /* black border */
+    padding:0 20px;
 }
 
-/* Current box (left) */
-.weather-box{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  padding: 8px 10px;
-  text-align:center;
+/* Each weather box */
+.forecast-item {
+    flex:1; /* equal width */
+    display:flex; 
+    flex-direction:column; 
+    align-items:center;
+    text-align:center;
 }
-.weather-icon-large{
-  width:200px;
-  height:200px;
-  object-fit:contain;
-  margin-bottom:6px;
-}
-#current-temp{ font-size:48px; font-weight:700; margin-bottom:6px;}
-#current-desc{ font-size:22px; text-transform:capitalize; margin-bottom:6px; }
-#current-highlow{ font-size:18px; opacity:0.9; margin-bottom:4px; }
-#current-precip{ font-size:18px; opacity:0.9; }
 
-/* Forecast (right) */
-.forecast-grid{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  align-items:stretch;
-  height:100%;
+/* Weather icons */
+.forecast-item .wi {
+    font-size:64px; 
+    margin-bottom:5px;
 }
-.forecast-item{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  padding:8px;
-  text-align:center;
-}
-.forecast-icon{
-  width:150px;
-  height:150px;
-  object-fit:contain;
-  margin-bottom:6px;
-}
-.forecast-item .t-hour{ font-size:20px; margin-bottom:4px; }
-.forecast-item .t-temp{ font-size:20px; font-weight:600; margin-bottom:4px;}
-.forecast-item .t-pop{ font-size:16px; opacity:0.9; }
 
-/* Settings panel */
-#settings{
-  position:fixed;
-  right:0;
-  top:0;
-  height:100vh;
-  width:300px;
-  background: var(--panel-bg);
-  transform: translateX(100%);
-  transition: transform 260ms ease;
-  padding:18px;
-  z-index:40;
-  box-sizing:border-box;
-  color:#fff;
+/* "Today:" label styling */
+#current-bottom > div:first-child {
+    margin-bottom:5px;
+    font-weight:bold;
+    font-size:16px; /* adjust as needed */
 }
-#settings.visible{ transform: translateX(0); }
-#settings h2{ margin:0 0 10px 0; font-size:20px; }
-#settings label{ display:block; margin-top:12px; font-size:14px; }
-#settings input[type=range] { width:100%; margin-top:6px; }
-#settings input[type=time] { width:100%; margin-top:6px; padding:6px; background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.08); border-radius:4px; }
-#btn-save{ margin-top:16px; width:100%; padding:10px; background:var(--accent); border:none; color:#fff; border-radius:6px; font-size:16px; cursor:pointer; }
-#settings p{ margin:10px 0 0 0; color:rgba(255,255,255,0.75); }
 
-/* Responsive smaller screens */
-@media (max-width:900px){
-  #time{ font-size: 90px; }
-  .weather-icon-large{ width:140px; height:140px; }
-  .forecast-icon{ width:90px; height:90px; }
+/* Settings menu */
+#settings {
+    position:absolute; 
+    top:10px; 
+    right:10px;
+    background: rgba(255,255,255,0.1); 
+    padding:10px; 
+    border-radius:10px; 
+    display:none;
 }
+#settings.visible { display:block; }
+
+input[type=range], input[type=time] { width:100px; margin-bottom:5px; }
+button { margin-top:5px; }
