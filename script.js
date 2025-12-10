@@ -41,7 +41,7 @@ function getWeatherIcon(iconCode) {
 function loadSettings() {
     console.log("Loading settings");
     const s = JSON.parse(localStorage.getItem('dashboard-settings') || '{}');
-    clockSizeInput.value = s.clockSize || 150;
+    clockSizeInput.value = s.clockSize || 100;
     brightnessInput.value = s.brightness || 255;
     dimStartInput.value = s.dimStart || "22:00";
     dimEndInput.value = s.dimEnd || "06:30";
@@ -139,16 +139,22 @@ async function fetchWeather(){
         currentPrecipEl.textContent = `${precip}% of rain`;
         currentIconEl.className = "wi "+getWeatherIcon(nowData.weather[0].icon);
 
-        // Forecast next 12 hours in 4-hour chunks
+        // Forecast next 12 hours in 4-hour chunks, horizontal
         forecastEl.innerHTML="";
         for(let i=1;i<=3;i++){
             const h = data.list[i*2]; // approx 6h increments
-            const hour = new Date(h.dt*1000).getHours();
+            const dateObj = new Date(h.dt*1000);
+            const hour = dateObj.getHours();
             let displayHour = hour%12; if(displayHour===0) displayHour=12;
             const ampmF = hour>=12?"PM":"AM";
 
             const div=document.createElement('div');
             div.className='forecast-item';
+            div.style.flex = "1";
+            div.style.display = "flex";
+            div.style.flexDirection = "column";
+            div.style.alignItems = "center";
+
             div.innerHTML=`
                 <i class="wi ${getWeatherIcon(h.weather[0].icon)}"></i>
                 <div>${displayHour}${ampmF}</div>
