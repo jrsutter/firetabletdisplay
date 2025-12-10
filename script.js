@@ -148,7 +148,7 @@ async function fetchWeather(){
         // Forecast next 12 hours in 4-hour chunks
         forecastEl.innerHTML="";
         for(let i=1;i<=3;i++){
-            const h = data.list[i*2];
+            const h = data.list[i];
             const dateObj = new Date(h.dt*1000);
             const hour = dateObj.getHours();
             let displayHour = hour%12; if(displayHour===0) displayHour=12;
