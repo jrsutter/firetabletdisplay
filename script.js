@@ -145,7 +145,7 @@ async function fetchWeather(){
         currentPrecipBottomEl.textContent = `${precip}% of rain`;
         currentIconBottomEl.className = "wi "+getWeatherIcon(nowData.weather[0].icon);
 
-        // Find forecast closest to now
+        // Find closest forecast to now
         const nowMs = Date.now();
         let closestIndex = 0;
         let minDiff = Infinity;
@@ -158,15 +158,15 @@ async function fetchWeather(){
             }
         }
 
-        // Next 3 3-hour chunks
+        // Next 3 3-hour chunks (local time)
         forecastEl.innerHTML="";
         for(let i = closestIndex + 1; i <= closestIndex + 3; i++){
             const h = data.list[i];
             if(!h) continue;
             const dateObj = new Date(h.dt*1000);
-            let hour = dateObj.getHours();
-            let displayHour = hour%12; if(displayHour===0) displayHour=12;
-            const ampmF = hour>=12?"PM":"AM";
+            const localHour = dateObj.getHours(); // local time
+            let displayHour = localHour % 12; if(displayHour===0) displayHour=12;
+            const ampmF = localHour>=12?"PM":"AM";
 
             const div=document.createElement('div');
             div.className='forecast-item';
@@ -201,7 +201,7 @@ setInterval(fetchWeather, REFRESH_INTERVAL_MIN*60*1000);
 function showSettings(){
     settingsEl.classList.add('visible');
     if(settingsTimeout) clearTimeout(settingsTimeout);
-    settingsTimeout = setTimeout(()=>settingsEl.classList.remove('visible'),10000);
+    settingsTimeout = setTimeout(()=>settingsEl.classList.remove('visible'),5000);
 }
 
 document.getElementById('dashboard').addEventListener('click', showSettings);
