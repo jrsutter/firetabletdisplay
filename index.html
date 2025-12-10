@@ -1,65 +1,103 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Clock + Weather Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+
+<!-- Weather Icons CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
+
+<style>
+    html, body {
+        margin:0;
+        padding:0;
+        height:100%;
+        background:black;
+        color:white;
+        font-family: 'Helvetica Neue', sans-serif;
+        overflow:hidden;
+    }
+    #dashboard {
+        display:flex;
+        flex-direction:column;
+        height:100%;
+        width:100%;
+    }
+    #top {
+        flex:2;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+    }
+    #time {
+        font-size:100px;
+    }
+    #date {
+        font-size:32px;
+    }
+    #current-weather {
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        margin-top:10px;
+    }
+    .wi {
+        font-size:80px;
+        margin-bottom:10px;
+    }
+    #bottom {
+        flex:1;
+        display:flex;
+        justify-content:space-around;
+        align-items:center;
+    }
+    .forecast-item {
+        text-align:center;
+        flex:1;
+    }
+    #settings {
+        position:absolute;
+        top:10px;
+        right:10px;
+        background: rgba(255,255,255,0.1);
+        padding:10px;
+        border-radius:10px;
+        display:none;
+    }
+    #settings.visible {
+        display:block;
+    }
+    input[type=range], input[type=time] {
+        width:100px;
+    }
+</style>
 </head>
 <body>
-  <div id="dashboard">
+<div id="dashboard">
+    <div id="top">
+        <div id="time">--:--</div>
+        <div id="date">Loading...</div>
+        <div id="current-weather">
+            <i id="current-icon" class="wi wi-day-sunny"></i>
+            <div id="current-temp">--°F</div>
+            <div id="current-precip">--% of rain</div>
+        </div>
+    </div>
+    <div id="bottom" >
+        <div id="forecast"></div>
+    </div>
+</div>
 
-    <!-- TOP 2/3: Clock -->
-    <header id="clock-section">
-      <div id="time">--:--</div>
-      <div id="date">Loading...</div>
-    </header>
-
-    <!-- BOTTOM 1/3: Weather -->
-    <section id="weather-section">
-
-      <!-- Current weather box (left) -->
-      <div id="current-weather" class="weather-box">
-        <img id="current-icon" class="weather-icon-large" src="" alt="current icon">
-        <div id="current-temp">--°F</div>
-        <div id="current-desc">Loading...</div>
-        <div id="current-highlow">H: -- • L: --</div>
-        <div id="current-precip">--% of rain</div>
-      </div>
-
-      <!-- Forecast boxes (right side - 3 columns) -->
-      <div id="forecast" class="forecast-grid">
-        <!-- forecast items inserted by script -->
-      </div>
-    </section>
-  </div>
-
-  <!-- Settings (slide-in panel from right) -->
-  <aside id="settings">
-    <h2>Settings</h2>
-
-    <label>Clock Size (px)
-      <input id="clock-size" type="range" min="50" max="800" value="150" />
-    </label>
-
-    <label>Brightness
-      <input id="brightness" type="range" min="10" max="255" value="220" />
-    </label>
-
-    <label>Dim Start
-      <input id="dim-start" type="time" value="21:00" />
-    </label>
-
-    <label>Dim End
-      <input id="dim-end" type="time" value="06:00" />
-    </label>
-
+<div id="settings">
+    Clock Size: <input type="range" id="clock-size" min="50" max="300" value="100"><br>
+    Brightness: <input type="range" id="brightness" min="0" max="255" value="255"><br>
+    Dim Start: <input type="time" id="dim-start" value="22:00"><br>
+    Dim End: <input type="time" id="dim-end" value="06:30"><br>
     <button id="btn-save">Save</button>
-    <p style="font-size:12px;opacity:0.7;margin-top:12px;">
-      Tap anywhere on screen to open settings. Settings auto-hide after 10s.
-    </p>
-  </aside>
+</div>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
