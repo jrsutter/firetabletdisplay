@@ -21,7 +21,7 @@ const btnSave = document.getElementById('btn-save');
 
 let settingsTimeout;
 
-// === WEATHER ICON MAPPING (White Weather Icons) ===
+// === WEATHER ICON MAPPING ===
 function getWeatherIcon(iconCode) {
     const map = {
         "01d":"wi-day-sunny","01n":"wi-night-clear",
@@ -37,7 +37,7 @@ function getWeatherIcon(iconCode) {
     return map[iconCode] || "wi-cloud";
 }
 
-// === LOAD SETTINGS ===
+// === SETTINGS ===
 function loadSettings() {
     console.log("Loading settings");
     const s = JSON.parse(localStorage.getItem('dashboard-settings') || '{}');
@@ -48,7 +48,6 @@ function loadSettings() {
     applySettings();
 }
 
-// === SAVE SETTINGS ===
 function saveSettings() {
     console.log("Saving settings");
     localStorage.setItem('dashboard-settings', JSON.stringify({
@@ -64,14 +63,22 @@ function applySettings() {
     const brightness = brightnessInput.value;
     const color = `rgb(${brightness},${brightness},${brightness})`;
 
+    // Clock and date
     timeEl.style.fontSize = `${clockSizeInput.value}px`;
     timeEl.style.color = color;
     dateEl.style.color = color;
+
+    // Current weather
     currentTempEl.style.color = color;
     currentPrecipEl.style.color = color;
     currentIconEl.style.color = color;
 
-    document.querySelectorAll('.forecast-item .wi').forEach(el => el.style.color = color);
+    // Forecast items (text + icons)
+    document.querySelectorAll('.forecast-item').forEach(item => {
+        item.style.color = color; // text
+        const icon = item.querySelector('.wi');
+        if(icon) icon.style.color = color; // icon
+    });
 }
 
 // === CLOCK ===
@@ -95,12 +102,18 @@ function updateClock() {
     if(currentTime >= dimStart || currentTime < dimEnd){
         const dimmed = brightnessInput.value * 0.4;
         const color = `rgb(${dimmed},${dimmed},${dimmed})`;
+
+        // Apply dim color to all text and icons
         timeEl.style.color=color;
         dateEl.style.color=color;
         currentTempEl.style.color=color;
         currentPrecipEl.style.color=color;
         currentIconEl.style.color=color;
-        document.querySelectorAll('.forecast-item .wi').forEach(el => el.style.color=color);
+        document.querySelectorAll('.forecast-item').forEach(item => {
+            item.style.color = color;
+            const icon = item.querySelector('.wi');
+            if(icon) icon.style.color = color;
+        });
     }
 }
 
@@ -125,12 +138,11 @@ async function fetchWeather(){
         const precip = nowData.pop ? Math.round(nowData.pop*100) : 0;
         currentPrecipEl.textContent = `${precip}% of rain`;
         currentIconEl.className = "wi "+getWeatherIcon(nowData.weather[0].icon);
-        currentIconEl.alt = nowData.weather[0].description;
 
-        // Forecast next 12 hours (approx every 4 hours)
+        // Forecast next 12 hours in 4-hour chunks
         forecastEl.innerHTML="";
         for(let i=1;i<=3;i++){
-            const h = data.list[i*2]; // 3h increments
+            const h = data.list[i*2]; // approx 6h increments
             const hour = new Date(h.dt*1000).getHours();
             let displayHour = hour%12; if(displayHour===0) displayHour=12;
             const ampmF = hour>=12?"PM":"AM";
