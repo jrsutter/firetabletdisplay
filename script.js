@@ -10,6 +10,9 @@ const dateEl = document.getElementById('date');
 const currentTempEl = document.getElementById('current-temp');
 const currentPrecipEl = document.getElementById('current-precip');
 const currentIconEl = document.getElementById('current-icon');
+const currentTempBottomEl = document.getElementById('current-temp-bottom');
+const currentPrecipBottomEl = document.getElementById('current-precip-bottom');
+const currentIconBottomEl = document.getElementById('current-icon-bottom');
 const forecastEl = document.getElementById('forecast');
 
 const settingsEl = document.getElementById('settings');
@@ -73,11 +76,15 @@ function applySettings() {
     currentPrecipEl.style.color = color;
     currentIconEl.style.color = color;
 
+    currentTempBottomEl.style.color = color;
+    currentPrecipBottomEl.style.color = color;
+    currentIconBottomEl.style.color = color;
+
     // Forecast items (text + icons)
     document.querySelectorAll('.forecast-item').forEach(item => {
-        item.style.color = color; // text
+        item.style.color = color;
         const icon = item.querySelector('.wi');
-        if(icon) icon.style.color = color; // icon
+        if(icon) icon.style.color = color;
     });
 }
 
@@ -109,6 +116,11 @@ function updateClock() {
         currentTempEl.style.color=color;
         currentPrecipEl.style.color=color;
         currentIconEl.style.color=color;
+
+        currentTempBottomEl.style.color=color;
+        currentPrecipBottomEl.style.color=color;
+        currentIconBottomEl.style.color=color;
+
         document.querySelectorAll('.forecast-item').forEach(item => {
             item.style.color = color;
             const icon = item.querySelector('.wi');
@@ -132,17 +144,17 @@ async function fetchWeather(){
         const data = await res.json();
         console.log("Weather data:",data);
 
-        // Current weather
+        // Current bottom weather
         const nowData = data.list[0];
-        currentTempEl.textContent = `${Math.round(nowData.main.temp)}°F (H:${Math.round(nowData.main.temp_max)} L:${Math.round(nowData.main.temp_min)})`;
+        currentTempBottomEl.textContent = `${Math.round(nowData.main.temp)}°F (H:${Math.round(nowData.main.temp_max)} L:${Math.round(nowData.main.temp_min)})`;
         const precip = nowData.pop ? Math.round(nowData.pop*100) : 0;
-        currentPrecipEl.textContent = `${precip}% of rain`;
-        currentIconEl.className = "wi "+getWeatherIcon(nowData.weather[0].icon);
+        currentPrecipBottomEl.textContent = `${precip}% of rain`;
+        currentIconBottomEl.className = "wi "+getWeatherIcon(nowData.weather[0].icon);
 
-        // Forecast next 12 hours in 4-hour chunks, horizontal
+        // Forecast next 12 hours in 4-hour chunks
         forecastEl.innerHTML="";
         for(let i=1;i<=3;i++){
-            const h = data.list[i*2]; // approx 6h increments
+            const h = data.list[i*2];
             const dateObj = new Date(h.dt*1000);
             const hour = dateObj.getHours();
             let displayHour = hour%12; if(displayHour===0) displayHour=12;
@@ -167,9 +179,9 @@ async function fetchWeather(){
         applySettings();
     } catch(e){
         console.error("Weather fetch failed:",e);
-        currentTempEl.textContent="Weather unavailable";
-        currentPrecipEl.textContent="";
-        currentIconEl.className="wi wi-na";
+        currentTempBottomEl.textContent="Weather unavailable";
+        currentPrecipBottomEl.textContent="";
+        currentIconBottomEl.className="wi wi-na";
         forecastEl.innerHTML="";
     }
 }
