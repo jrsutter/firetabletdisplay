@@ -145,12 +145,26 @@ async function fetchWeather(){
         currentPrecipBottomEl.textContent = `${precip}% of rain`;
         currentIconBottomEl.className = "wi "+getWeatherIcon(nowData.weather[0].icon);
 
-        // Forecast next 12 hours in 4-hour chunks
+        // Find forecast closest to now
+        const nowMs = Date.now();
+        let closestIndex = 0;
+        let minDiff = Infinity;
+        for (let i = 0; i < data.list.length; i++) {
+            const forecastTime = data.list[i].dt*1000;
+            const diff = Math.abs(forecastTime - nowMs);
+            if(diff < minDiff){
+                minDiff = diff;
+                closestIndex = i;
+            }
+        }
+
+        // Next 3 3-hour chunks
         forecastEl.innerHTML="";
-        for(let i=1;i<=3;i++){
+        for(let i = closestIndex + 1; i <= closestIndex + 3; i++){
             const h = data.list[i];
+            if(!h) continue;
             const dateObj = new Date(h.dt*1000);
-            const hour = dateObj.getHours();
+            let hour = dateObj.getHours();
             let displayHour = hour%12; if(displayHour===0) displayHour=12;
             const ampmF = hour>=12?"PM":"AM";
 
@@ -187,7 +201,7 @@ setInterval(fetchWeather, REFRESH_INTERVAL_MIN*60*1000);
 function showSettings(){
     settingsEl.classList.add('visible');
     if(settingsTimeout) clearTimeout(settingsTimeout);
-    settingsTimeout = setTimeout(()=>settingsEl.classList.remove('visible'),5000);
+    settingsTimeout = setTimeout(()=>settingsEl.classList.remove('visible'),10000);
 }
 
 document.getElementById('dashboard').addEventListener('click', showSettings);
