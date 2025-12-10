@@ -1,59 +1,64 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Clock + Weather Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Clock + Weather Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="dashboard">
 
-<div id="dashboard">
+    <!-- TOP 2/3: Clock -->
+    <header id="clock-section">
+      <div id="time">--:--</div>
+      <div id="date">Loading...</div>
+    </header>
 
-    <!-- CLOCK SECTION -->
-    <div id="clock-section">
-        <div id="time">--:--</div>
-        <div id="date">Loading...</div>
-    </div>
+    <!-- BOTTOM 1/3: Weather -->
+    <section id="weather-section">
+      <!-- Current weather box (left) -->
+      <div id="current-weather" class="weather-box">
+        <img id="current-icon" class="weather-icon-large" src="" alt="current icon">
+        <div id="current-temp">--°F</div>
+        <div id="current-desc">Loading...</div>
+        <div id="current-highlow">H: -- / L: --</div>
+        <div id="current-precip">--% of rain</div>
+      </div>
 
-    <!-- WEATHER SECTION -->
-    <div id="weather-section">
+      <!-- Forecast boxes (right side - 3 columns) -->
+      <div id="forecast" class="forecast-grid">
+        <!-- forecast items inserted by script -->
+      </div>
+    </section>
+  </div>
 
-        <!-- CURRENT WEATHER -->
-        <div id="current-weather" class="weather-box">
-            <img id="current-icon" class="weather-icon-large" src="" alt="Current Weather">
-            <div id="current-temp">--°F</div>
-            <div id="current-desc">Loading...</div>
-            <div id="current-precip">--% of rain</div>
-        </div>
-
-        <!-- FORECAST GRID -->
-        <div id="forecast" class="forecast-grid">
-            <!-- Forecast items added by script.js -->
-        </div>
-
-    </div>
-
-</div>
-
-<!-- SETTINGS MENU -->
-<div id="settings">
+  <!-- Settings (slide-in panel from right) -->
+  <aside id="settings">
     <h2>Settings</h2>
 
-    <label>Clock Size (px):</label>
-    <input type="range" id="clock-size" min="50" max="500">
+    <label>Clock Size (px)
+      <input id="clock-size" type="range" min="50" max="800" value="150" />
+    </label>
 
-    <label>Brightness:</label>
-    <input type="range" id="brightness" min="10" max="255">
+    <label>Brightness
+      <input id="brightness" type="range" min="10" max="255" value="220" />
+    </label>
 
-    <label>Dim Start:</label>
-    <input type="time" id="dim-start">
+    <label>Dim Start
+      <input id="dim-start" type="time" value="21:00" />
+    </label>
 
-    <label>Dim End:</label>
-    <input type="time" id="dim-end">
+    <label>Dim End
+      <input id="dim-end" type="time" value="06:00" />
+    </label>
 
     <button id="btn-save">Save</button>
-</div>
+    <p style="font-size:12px;opacity:0.7;margin-top:12px;">
+      Tap anywhere on screen to open settings. Settings auto-hide after 10s.
+    </p>
+  </aside>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
