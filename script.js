@@ -3,12 +3,13 @@
      - current:  /data/2.5/weather
      - forecast: /data/2.5/forecast
    Replace PLACEHOLDER_KEY with your OpenWeather API key.
+   Option C selected: show next 3 forecast entries (approx +3h, +6h, +9h)
 */
 
-console.log("Script loaded (full dashboard)");
+console.log("Script loaded (Option C - next 3 forecast entries)");
 
 // CONFIG
-const API_KEY = "ccd59c5e8afff546aeb07513036a9b55"; // <- replace this with your OpenWeather API key
+const API_KEY = "ccd59c5e8afff546aeb07513036a9b55"; // <-- REPLACE this with your API key
 const LAT = 30.312156;
 const LON = -95.456014;
 const REFRESH_MIN = 30;
@@ -34,11 +35,12 @@ const btnSave = document.getElementById("btn-save");
 
 let settingsTimeout = null;
 
-// --- Utilities / Debugging ---
+// Helpers
 function safeLog(...args){ console.log(...args); }
 function isoNow(){ return Math.floor(Date.now()/1000); }
+function toMinutes(t){ if(!t || !t.includes(":")) return 0; const [hh,mm]=t.split(":").map(x=>parseInt(x,10)); return hh*60 + (isNaN(mm)?0:mm); }
 
-// --- Settings persistence ---
+// Settings load/save
 function loadSettings(){
   safeLog("loadSettings()");
   const raw = localStorage.getItem("dashboard-settings");
@@ -50,7 +52,6 @@ function loadSettings(){
   dimEndInput.value = s.dimEnd ?? "06:00";
   applySettings();
 }
-
 function saveSettings(){
   const s = {
     clockSize: clockSizeInput.value,
@@ -62,37 +63,25 @@ function saveSettings(){
   safeLog("Settings saved", s);
 }
 
-// --- Apply visual settings ---
+// Apply visual settings
 function applySettings(){
   safeLog("applySettings()");
-  // clock size
   timeEl.style.fontSize = `${clockSizeInput.value}px`;
-  // immediate brightness application
   applyBrightness();
 }
 
-// parse HH:MM to minutes after midnight
-function toMinutes(t){
-  if(!t || !t.includes(":")) return 0;
-  const [hh,mm] = t.split(":").map(x=>parseInt(x,10));
-  return hh*60 + (isNaN(mm)?0:mm);
-}
-
+// Brightness/dimming
 function applyBrightness(){
   const now = new Date();
   const curMinutes = now.getHours()*60 + now.getMinutes();
   const ds = toMinutes(dimStartInput.value);
   const de = toMinutes(dimEndInput.value);
-
   let target;
-  // if dim window does not cross midnight (ds < de), check in-range
   if(ds < de){
     target = (curMinutes >= ds && curMinutes < de) ? 60 : parseInt(brightnessInput.value,10);
   } else {
-    // wraps midnight
     target = (curMinutes >= ds || curMinutes < de) ? 60 : parseInt(brightnessInput.value,10);
   }
-
   const color = `rgb(${target},${target},${target})`;
   timeEl.style.color = color;
   dateEl.style.color = color;
@@ -102,8 +91,9 @@ function applyBrightness(){
   currentPrecipEl.style.color = color;
   document.querySelectorAll(".forecast-item").forEach(el => el.style.color = color);
 }
+setInterval(applyBrightness, 1000);
 
-// --- Clock (12-hour) ---
+// Clock (12-hour)
 function updateClock(){
   const now = new Date();
   let h = now.getHours();
@@ -116,106 +106,97 @@ function updateClock(){
 setInterval(updateClock, 1000);
 updateClock();
 
-// --- Weather: use free endpoints ---
-// 1) Current weather: /data/2.5/weather  (gives temp, weather[0], etc.)
-// 2) Forecast: /data/2.5/forecast (3-hour steps) -> we will pick closest entries for +4h/+8h/+12h
+// Build API URLs
+function curUrl(){ return `https://api.openweathermap.org/data/2.5/weather?lat=${LAT}&lon=${LON}&units=imperial&appid=${API_KEY}`; }
+function forecastUrl(){ return `https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&units=imperial&appid=${API_KEY}`; }
 
-function buildCurrentUrl(){
-  return `https://api.openweathermap.org/data/2.5/weather?lat=${LAT}&lon=${LON}&units=imperial&appid=${API_KEY}`;
-}
-function buildForecastUrl(){
-  return `https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&units=imperial&appid=${API_KEY}`;
-}
-
-// find forecast list item closest at-or-after targetUnix
+// find next forecast entry at-or-after targetUnix
 function findForecastAfter(list, targetUnix){
   for(let i=0;i<list.length;i++){
     if(list[i].dt >= targetUnix) return list[i];
   }
-  // fallback last
   return list[list.length-1];
 }
 
+// Fetch both APIs and update DOM
 async function fetchWeatherAll(){
   safeLog("fetchWeatherAll() start");
   try {
     // current
-    const curUrl = buildCurrentUrl();
-    safeLog("Fetching current:", curUrl);
-    const curRes = await fetch(curUrl);
-    if(!curRes.ok){
-      const txt = await curRes.text();
-      throw new Error(`Current weather HTTP ${curRes.status}: ${txt}`);
+    const u1 = curUrl();
+    safeLog("Fetching current:", u1);
+    const r1 = await fetch(u1);
+    if(!r1.ok){
+      const txt = await r1.text();
+      throw new Error(`Current HTTP ${r1.status}: ${txt}`);
     }
-    const curData = await curRes.json();
-    safeLog("Current data:", curData);
+    const cur = await r1.json();
+    safeLog("Current data:", cur);
 
     // forecast
-    const fUrl = buildForecastUrl();
-    safeLog("Fetching forecast:", fUrl);
-    const fRes = await fetch(fUrl);
-    if(!fRes.ok){
-      const txt = await fRes.text();
-      throw new Error(`Forecast HTTP ${fRes.status}: ${txt}`);
+    const u2 = forecastUrl();
+    safeLog("Fetching forecast:", u2);
+    const r2 = await fetch(u2);
+    if(!r2.ok){
+      const txt = await r2.text();
+      throw new Error(`Forecast HTTP ${r2.status}: ${txt}`);
     }
-    const fData = await fRes.json();
-    safeLog("Forecast data:", fData);
+    const f = await r2.json();
+    safeLog("Forecast data:", f);
 
-    // Update UI with current
+    // Update current UI
     try {
-      const c = curData;
-      const temp = Math.round(c.main.temp);
+      const temp = Math.round(cur.main.temp);
       currentTempEl.textContent = `${temp}°F`;
 
-      // description and icon
-      const cw = (c.weather && c.weather[0]) ? c.weather[0] : null;
-      if(cw){
-        currentDescEl.textContent = cw.description || "";
-        currentIconEl.src = `https://openweathermap.org/img/wn/${cw.icon}@2x.png`;
-        currentIconEl.alt = cw.description || "weather";
+      const weatherObj = cur.weather && cur.weather[0] ? cur.weather[0] : null;
+      if(weatherObj){
+        currentDescEl.textContent = weatherObj.description || "";
+        currentIconEl.src = `https://openweathermap.org/img/wn/${weatherObj.icon}@2x.png`;
+        currentIconEl.alt = weatherObj.description || "weather";
         safeLog("Current icon URL:", currentIconEl.src);
       } else {
         currentDescEl.textContent = "";
       }
 
-      // precip chance: forecast.list[0] corresponds to next 3-hour block; use forecast for nearest period
+      // precip chance: use forecast nearest to now
       const nowUnix = isoNow();
-      const next0 = findForecastAfter(fData.list, nowUnix);
-      const pop0 = (typeof next0.pop !== "undefined") ? next0.pop : 0;
-      currentPrecipEl.textContent = `${Math.round(pop0*100)}% of rain`;
-      safeLog("Using forecast entry for current POP:", next0, "pop0:", pop0);
+      const nearest = findForecastAfter(f.list, nowUnix);
+      const popNow = (typeof nearest.pop !== "undefined") ? nearest.pop : 0;
+      currentPrecipEl.textContent = `${Math.round(popNow*100)}% of rain`;
+      safeLog("Nearest forecast for current pop:", nearest.dt, "pop:", popNow);
 
-      // compute today's high/low from forecast's same day entries + current.temp
-      const today = new Date().getDate();
-      let temps = [c.main.temp];
-      fData.list.forEach(it => {
+      // compute today's hi/lo from forecast entries (plus current)
+      const todayNum = new Date().getDate();
+      let temps = [cur.main.temp];
+      f.list.forEach(it=>{
         const d = new Date(it.dt*1000);
-        if(d.getDate() === today) temps.push(it.main.temp);
+        if(d.getDate() === todayNum) temps.push(it.main.temp);
       });
       const hi = Math.round(Math.max(...temps));
       const lo = Math.round(Math.min(...temps));
       currentHighLowEl.textContent = `H: ${hi}° • L: ${lo}°`;
       safeLog("Computed hi/lo:", hi, lo);
     } catch(e){
-      console.error("Failed updating current UI:", e);
+      console.error("Error updating current UI:", e);
     }
 
-    // Build forecast boxes for +4h, +8h, +12h (closest available entries)
+    // Build forecast boxes: next 3 forecast list entries (C: next 3 entries)
     forecastEl.innerHTML = "";
-    const offsets = [4,8,12];
     const nowUnix = isoNow();
-    offsets.forEach(offsetHours => {
-      const target = nowUnix + offsetHours*3600;
-      const entry = findForecastAfter(fData.list, target);
-      if(!entry){
-        safeLog("No forecast entry found for offset", offsetHours);
-        return;
-      }
+    // find first forecast at-or-after now
+    let firstIndex = f.list.findIndex(it=> it.dt >= nowUnix);
+    if(firstIndex === -1) firstIndex = 0;
+    const picks = [firstIndex, firstIndex+1, firstIndex+2]; // next 3 entries
+    safeLog("Forecast pick indexes:", picks, "list length:", f.list.length);
+
+    picks.forEach(idx=>{
+      const entry = f.list[Math.min(idx, f.list.length-1)];
+      if(!entry) return;
       const icon = entry.weather && entry.weather[0] ? entry.weather[0].icon : null;
       const desc = entry.weather && entry.weather[0] ? entry.weather[0].description : "";
       const temp = Math.round(entry.main.temp);
       const pop = Math.round((entry.pop ?? 0)*100);
-
       const dateObj = new Date(entry.dt*1000);
       let hour = dateObj.getHours();
       const ampm = hour >= 12 ? "PM" : "AM";
@@ -230,14 +211,13 @@ async function fetchWeatherAll(){
         <div class="t-pop">${pop}% rain</div>
       `;
       forecastEl.appendChild(div);
-      safeLog(`Forecast offset ${offsetHours}h -> entry dt:${entry.dt} hour:${hour} temp:${temp} pop:${pop} icon:${icon}`);
+      safeLog("Added forecast entry:", entry.dt, "hour:", hour, "temp:", temp, "pop:", pop, "icon:", icon);
     });
 
     applyBrightness();
-    safeLog("fetchWeatherAll() finished successfully");
-  } catch (err){
+    safeLog("fetchWeatherAll() finished");
+  } catch(err){
     console.error("Weather fetch failed:", err);
-    // show simple error text in UI so user sees something
     currentDescEl.textContent = "Weather unavailable";
     currentTempEl.textContent = "--°F";
     currentHighLowEl.textContent = "";
@@ -246,12 +226,11 @@ async function fetchWeatherAll(){
   }
 }
 
-// initial fetch + interval
+// initial fetch + periodic refresh
 fetchWeatherAll();
 setInterval(fetchWeatherAll, REFRESH_MIN * 60 * 1000);
 
-// --- Settings interactions ---
-// Show settings on any tap/click; hide after 10s inactivity
+// Settings interactions
 function showSettings(){
   settingsEl.classList.add("visible");
   if(settingsTimeout) clearTimeout(settingsTimeout);
@@ -271,5 +250,4 @@ btnSave.addEventListener("click", ()=>{ saveSettings(); showSettings(); });
 // load stored settings
 loadSettings();
 
-// remove automatic fullscreen call (must be user gesture): provide console guidance
-console.log("Note: automatic fullscreen is disabled to avoid browser restrictions. Tap the browser menu to enable fullscreen (or implement a user-triggered fullscreen button).");
+console.log("Dashboard initialized. Replace PLACEHOLDER_KEY with your OpenWeather API key and reload.");
