@@ -9,69 +9,38 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
 
 <style>
-    html, body {
-        margin:0;
-        padding:0;
-        height:100%;
-        background:black;
-        color:white;
-        font-family: 'Helvetica Neue', sans-serif;
-        overflow:hidden;
-    }
-    #dashboard {
-        display:flex;
-        flex-direction:column;
-        height:100%;
-        width:100%;
-    }
-    #top {
-        flex:2;
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        align-items:center;
-    }
-    #time {
-        font-size:100px;
-    }
-    #date {
-        font-size:32px;
-    }
-    #current-weather {
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        margin-top:10px;
-    }
-    .wi {
-        font-size:80px;
-        margin-bottom:10px;
-    }
-    #bottom {
-        flex:1;
-        display:flex;
-        justify-content:space-around;
-        align-items:center;
-    }
-    .forecast-item {
-        text-align:center;
-        flex:1;
-    }
-    #settings {
-        position:absolute;
-        top:10px;
-        right:10px;
-        background: rgba(255,255,255,0.1);
-        padding:10px;
-        border-radius:10px;
-        display:none;
-    }
-    #settings.visible {
-        display:block;
-    }
-    input[type=range], input[type=time] {
-        width:100px;
-    }
+html, body {
+    margin:0; padding:0; height:100%; background:black; color:white;
+    font-family: 'Helvetica Neue', sans-serif; overflow:hidden;
+}
+#dashboard {
+    display:flex; flex-direction:column; height:100%; width:100%;
+}
+#top {
+    flex:2; display:flex; flex-direction:column;
+    justify-content:center; align-items:center;
+}
+#time { font-size:100px; }
+#date { font-size:32px; margin-bottom:10px; }
+#current-weather { display:flex; flex-direction:column; align-items:center; }
+#current-weather .wi { font-size:100px; margin-bottom:10px; }
+
+#bottom {
+    flex:1; display:flex; justify-content:space-around; align-items:center;
+    border-top:1px solid rgba(255,255,255,0.2);
+}
+.forecast-item {
+    text-align:center; flex:1; display:flex; flex-direction:column; align-items:center;
+}
+.forecast-item .wi { font-size:64px; margin-bottom:5px; }
+
+#settings {
+    position:absolute; top:10px; right:10px;
+    background: rgba(255,255,255,0.1); padding:10px; border-radius:10px; display:none;
+}
+#settings.visible { display:block; }
+input[type=range], input[type=time] { width:100px; margin-bottom:5px; }
+button { margin-top:5px; }
 </style>
 </head>
 <body>
