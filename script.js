@@ -1,8 +1,8 @@
 // === CONFIG ===
-const API_KEY = "ccd59c5e8afff546aeb07513036a9b55"; // replace with your valid OpenWeather API key
-const LAT = "30.312156"; 
+const API_KEY = "ccd59c5e8afff546aeb07513036a9b55";
+const LAT = "30.312156";
 const LON = "-95.456014";
-const REFRESH_INTERVAL_MIN = 30; // refresh weather every 30 minutes
+const REFRESH_INTERVAL_MIN = 30; // refresh every 30 min
 
 // === DOM Elements ===
 const timeEl = document.getElementById('time');
@@ -90,7 +90,7 @@ updateClock();
 // === WEATHER ===
 async function fetchWeather() {
     console.log("Fetching weather...");
-    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${LAT}&lon=${LON}&exclude=minutely,daily,alerts&units=imperial&appid=${API_KEY}`;
+    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&units=imperial&appid=${API_KEY}`;
     console.log("Weather API URL:", url);
 
     try {
@@ -99,29 +99,31 @@ async function fetchWeather() {
         const data = await res.json();
         console.log("Weather data received:", data);
 
-        // Current
-        currentTempEl.textContent = `${Math.round(data.current.temp)}°F (H:${Math.round(data.daily[0].temp.max)} L:${Math.round(data.daily[0].temp.min)})`;
-        const precip = data.current.pop ? Math.round(data.current.pop*100) : 0;
+        // Current weather (first item in list)
+        const nowData = data.list[0];
+        currentTempEl.textContent = `${Math.round(nowData.main.temp)}°F (H:${Math.round(nowData.main.temp_max)} L:${Math.round(nowData.main.temp_min)})`;
+        const precip = nowData.pop ? Math.round(nowData.pop*100) : 0;
         currentPrecipEl.textContent = `${precip}% of rain`;
-        currentIconEl.src = `https://openweathermap.org/img/wn/${data.current.weather[0].icon}@2x.png`;
-        currentIconEl.alt = data.current.weather[0].description;
+        currentIconEl.src = `https://openweathermap.org/img/wn/${nowData.weather[0].icon}@2x.png`;
+        currentIconEl.alt = nowData.weather[0].description;
 
         // Forecast next 12 hours in 3 chunks of 4 hours
         forecastEl.innerHTML = "";
         for(let i=1; i<=3; i++){
-            const h = data.hourly[i*4];
+            const h = data.list[i*2]; // each forecast is 3h apart, so *2 = 6h increments
             const div = document.createElement('div');
             div.className='forecast-item';
             const hour = new Date(h.dt * 1000).getHours();
             let displayHour = hour % 12;
             if(displayHour === 0) displayHour = 12;
             const ampmF = hour >= 12 ? "PM" : "AM";
+
             div.innerHTML = `
                 <div style="text-align:center;">
                     <img src="https://openweathermap.org/img/wn/${h.weather[0].icon}@2x.png" 
                          alt="${h.weather[0].description}" style="width:64px;height:64px;">
                     <div>${displayHour}${ampmF}</div>
-                    <div>${Math.round(h.temp)}°F</div>
+                    <div>${Math.round(h.main.temp)}°F</div>
                     <div>${Math.round(h.pop*100)}% of rain</div>
                 </div>
             `;
